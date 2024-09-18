@@ -59,7 +59,8 @@ class APEL:
         mesh_file = dict_obj["obj_file"]
         self.copy_mesh_file_to_pycram_resources(mesh_file)
         pose = self.parse_object_pose(dict_obj["pose"])
-        self.pycram_objects.append(Object(name, ObjectType.ENVIRONMENT, mesh_file, pose=pose))
+        scale = float(dict_obj["scale"][0])
+        self.pycram_objects.append(Object(name, ObjectType.ENVIRONMENT, mesh_file, pose=pose, scale_mesh=scale))
 
     def copy_mesh_file_to_pycram_resources(self, mesh_file: str):
         """
