@@ -4,7 +4,7 @@ import shutil
 
 import numpy as np
 from tf.transformations import quaternion_from_matrix
-from typing_extensions import List, Dict, Tuple
+from typing_extensions import List, Dict
 
 from apel.utils import hex_to_rgba
 from pycram.datastructures.dataclasses import Color
