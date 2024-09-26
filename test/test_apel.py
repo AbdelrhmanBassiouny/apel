@@ -42,7 +42,7 @@ class TestAPEL(TestCase):
                                                     self.apel.data[0]["obj_file"])))
 
     def test_load_object(self):
-        self.apel.load_object(self.apel.data[0])
+        self.apel.load_generic_object(self.apel.data[0])
         self.assertTrue(len(self.apel.pycram_objects) > 0)
         self.assertTrue(isinstance(self.apel.pycram_objects[0], Object))
 

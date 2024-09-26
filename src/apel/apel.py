@@ -4,12 +4,13 @@ import shutil
 
 import numpy as np
 from tf.transformations import quaternion_from_matrix
-from typing_extensions import List, Dict
+from typing_extensions import List, Dict, Tuple
 
 from pycram.datastructures.pose import Pose
 from pycram.datastructures.world import World
 from pycram.datastructures.enums import ObjectType
 from pycram.world_concepts.world_object import Object
+from pycram.object_descriptors.generic import ObjectDescription as GenericObjectDescription
 
 
 class APEL:
@@ -47,20 +48,66 @@ class APEL:
         Load the objects from the json file.
         """
         for obj in self.data:
-            self.load_object(obj)
+            self.load_generic_object(obj)
 
-    def load_object(self, dict_obj: Dict):
+    def load_generic_object(self, dict_obj: Dict):
         """
         Load a single object from a dictionary.
 
         :param dict_obj: The dictionary object to load.
         """
-        name = dict_obj["class"] + "_" + str(dict_obj["id"])
+        name, pose = self.get_name_and_pose_of_object(dict_obj)
+        half_extents = self.get_half_extents_from_object(dict_obj)
+        gen_obj_desc = GenericObjectDescription(name, [0, 0, 0], half_extents)
+        obj = Object(name, ObjectType.ENVIRONMENT, path=None, description=gen_obj_desc, pose=pose)
+        obj.set_pose(pose)
+        self.pycram_objects.append(obj)
+
+    def get_half_extents_from_object(self, dict_obj: Dict) -> List[float]:
+        """
+        Get the half extents of an object from a dictionary.
+
+        :param dict_obj: The dictionary object.
+        :return: The half extents of the object.
+        """
+        vertices = np.array(dict_obj["vertices"])
+        return self.get_half_extents_from_vertices(vertices)
+
+    @staticmethod
+    def get_half_extents_from_vertices(vertices: np.ndarray) -> List[float]:
+        """
+        Get the half extents of an object from its vertices.
+
+        :param vertices: The vertices of the object.
+        :return: The half extents of the object.
+        """
+        min_coords = np.min(vertices, axis=0)
+        max_coords = np.max(vertices, axis=0)
+        half_extents = (max_coords - min_coords)
+        return half_extents.tolist()
+
+    def load_mesh_object(self, dict_obj: Dict):
+        """
+        Load a single object from a dictionary by using mesh.
+
+        :param dict_obj: The dictionary object to load.
+        """
+        name, pose = self.get_name_and_pose_of_object(dict_obj)
         mesh_file = dict_obj["obj_file"]
         self.copy_mesh_file_to_pycram_resources(mesh_file)
-        pose = self.parse_object_pose(dict_obj["pose"])
         scale = float(dict_obj["scale"][0])
         self.pycram_objects.append(Object(name, ObjectType.ENVIRONMENT, mesh_file, pose=pose, scale_mesh=scale))
+
+    def get_name_and_pose_of_object(self, dict_obj: Dict) -> (str, Pose):
+        """
+        Get the name and pose of an object from a dictionary.
+
+        :param dict_obj: The dictionary object.
+        :return: The name and pose of the object.
+        """
+        name = dict_obj["class"] + "_" + str(dict_obj["id"])
+        pose = self.parse_object_pose(dict_obj["pose"])
+        return name, pose
 
     def copy_mesh_file_to_pycram_resources(self, mesh_file: str):
         """
