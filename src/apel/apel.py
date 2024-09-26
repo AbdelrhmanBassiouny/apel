@@ -6,6 +6,8 @@ import numpy as np
 from tf.transformations import quaternion_from_matrix
 from typing_extensions import List, Dict, Tuple
 
+from apel.utils import hex_to_rgba
+from pycram.datastructures.dataclasses import Color
 from pycram.datastructures.pose import Pose
 from pycram.datastructures.world import World
 from pycram.datastructures.enums import ObjectType
@@ -30,6 +32,10 @@ class APEL:
         self.json_file: str = json_file
         self.env_dir: str = os.path.dirname(json_file)
         self.data: List[Dict] = self.load_json_file()
+        self.class_color_map: Dict[str, str] = {"wall": "#FBFAF5",
+                                                "door": "#F7C59F",
+                                                "window": "#53F4FF"}
+
         self.pycram_objects: List[Object] = []
         self.world = world
 
@@ -58,10 +64,19 @@ class APEL:
         """
         name, pose = self.get_name_and_pose_of_object(dict_obj)
         half_extents = self.get_half_extents_from_object(dict_obj)
-        gen_obj_desc = GenericObjectDescription(name, [0, 0, 0], half_extents)
-        obj = Object(name, ObjectType.ENVIRONMENT, path=None, description=gen_obj_desc, pose=pose)
-        obj.set_pose(pose)
+        color = self.get_color_from_object(dict_obj)
+        gen_obj_desc = GenericObjectDescription(name, [0, 0, 0], half_extents, color=color)
+        obj = Object(name, ObjectType.ENVIRONMENT, description=gen_obj_desc, pose=pose)
         self.pycram_objects.append(obj)
+
+    def get_color_from_object(self, dict_obj: Dict) -> Color:
+        """
+        Get the color of an object from a dictionary.
+
+        :param dict_obj: The dictionary object.
+        :return: The color of the object.
+        """
+        return hex_to_rgba(self.class_color_map[dict_obj["class"]])
 
     def get_half_extents_from_object(self, dict_obj: Dict) -> List[float]:
         """
@@ -83,7 +98,7 @@ class APEL:
         """
         min_coords = np.min(vertices, axis=0)
         max_coords = np.max(vertices, axis=0)
-        half_extents = (max_coords - min_coords)
+        half_extents = (max_coords - min_coords) / 2
         return half_extents.tolist()
 
     def load_mesh_object(self, dict_obj: Dict):

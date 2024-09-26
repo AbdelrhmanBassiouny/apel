@@ -2,7 +2,7 @@ import os
 from unittest import TestCase
 from apel.apel import APEL
 from pycram import World
-from pycram.datastructures.enums import WorldMode
+from pycram.datastructures.enums import WorldMode, ObjectType
 from pycram.datastructures.pose import Pose
 from pycram.ros.viz_marker_publisher import VizMarkerPublisher
 from pycram.world_concepts.world_object import Object
@@ -16,7 +16,7 @@ class TestAPEL(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.world = BulletWorld(mode=WorldMode.DIRECT)
+        cls.world = BulletWorld(mode=WorldMode.GUI)
         cls.apel = APEL("../envs/scene_bundle_1/scene.json", cls.world.current_world)
         cls.viz_marker_publisher = VizMarkerPublisher()
 
