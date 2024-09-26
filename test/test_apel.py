@@ -17,7 +17,7 @@ class TestAPEL(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.world = BulletWorld(mode=WorldMode.DIRECT)
-        cls.apel = APEL("../resources/envs/scene_bundle_1/scene.json", cls.world.current_world)
+        cls.apel = APEL("../envs/scene_bundle_1/scene.json", cls.world.current_world)
         cls.viz_marker_publisher = VizMarkerPublisher()
 
     @classmethod
