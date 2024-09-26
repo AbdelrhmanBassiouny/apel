@@ -21,6 +21,9 @@ class APEL:
     """
     resources_path: str = "../resources"
     envs_path: str = os.path.join(resources_path, "envs")
+    class_color_map: Dict[str, str] = {"wall": "#FBFAF5",
+                                       "door": "#F7C59F",
+                                       "window": "#53F4FF"}
 
     def __init__(self, json_file: str, world: World):
         """
@@ -32,9 +35,6 @@ class APEL:
         self.json_file: str = json_file
         self.env_dir: str = os.path.dirname(json_file)
         self.data: List[Dict] = self.load_json_file()
-        self.class_color_map: Dict[str, str] = {"wall": "#FBFAF5",
-                                                "door": "#F7C59F",
-                                                "window": "#53F4FF"}
 
         self.pycram_objects: List[Object] = []
         self.world = world
